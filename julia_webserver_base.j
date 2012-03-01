@@ -1,38 +1,46 @@
-###########################################
-# protocol
-###########################################
 
-###### the julia<-->server protocol #######
+const DEFAULT_PROTOCOL = "HTTP/1.1"
+const DEFAULT_METHOD = "GET"
+const DEFAULT_PATH = "/"
 
-# the message type is sent as a byte
-# the next byte indicates how many arguments there are
-# each argument is four bytes indicating the size of the argument, then the data for that argument
-
-###### the server<-->browser protocol #####
-
-# messages are sent as arrays of arrays (json)
-# the outer array is an "array of messages"
-# each message is itself an array:
-# [message_type::number, arg0::string, arg1::string, ...]
-
-# import the message types
 load("./ui/webserver/message_types.h")
 
-###########################################
-# set up the socket connection
-###########################################
-
-# open a socket on any port
-__ports = [int16(4444)]
-__sockfd = ccall(:open_any_tcp_port, Int32, (Ptr{Int16},), __ports)
-if __sockfd == -1
-    # couldn't open the socket
-    println("could not open server socket on port 4444.")
-    exit()
+function hextoten(num)
+    len = length(num)
+    num = uppercase(num)
+    index = 0
+    total = 0x0
+    for i=num
+        index += 1
+        count = 0
+        if int(i) <= 57
+            count = int(i) - 48
+        else
+            count = int(i) - 55
+        end
+        count = count * 16^(len-index)
+        total += count
+    end
+    convert(Uint8, total)
 end
 
-# print the socket number so the server knows what it is
-println(__ports[1])
+
+function URLDecode(str)
+    str = replace(str, "+", "%20")
+    chars = split(str, '%')
+    if length(chars) <= 1
+        return str
+    end
+    strs = ""
+    for i=chars
+        global strs
+        if length(i) < 2
+            continue
+        end
+        strs = strcat(strs, UTF8String([hextoten(i[1:2])]), i[3:])
+    end
+    strs
+end
 
 function __readline()
     global __io
@@ -56,18 +64,36 @@ end
 
 function __read_message()
     line_index = 0
-    __method = "GET"
-    __path = "/"
-    __protocol = "HTTP/1.1"
+    __method = DEFAULT_METHOD
+    __path = DEFAULT_PATH
+    __protocol = DEFAULT_PROTOCOL
     __data = HashTable()
+    post_read_more_line = false
     while true
         line = __readline()
         if length(line) <= 1
+            if post_read_more_line
+                post_read_more_line = false
+                if has(__data, "Content-Length") && int(__data["Content-Length"]) > 0
+                    argstring = read(__io, Uint8, int(__data["Content-Length"]))
+                    argstring = UTF8String(argstring)
+                    __args = split(argstring, '&')
+                    args_hash = HashTable()
+                    for arg_string = __args
+                        (key, value) = match(r"^([^=]+)=(.*)$", arg_string).captures
+                        args_hash[key] = URLDecode(value)
+                    end
+                    __data["args"] = args_hash
+                end
+            end
             break
         end
         if line_index == 0
             m = match(r"^(\w+)\s([^\s]+)\s([^\n\r]+)", line)
             (__method, __path, __protocol) = m.captures
+            if __method == "POST"
+                post_read_more_line = true
+            end
         else
             m = match(r"^([\w\-]+)\:\s([^\n\r]+)", line)
             (key, value) = m.captures
@@ -89,26 +115,35 @@ end
 
 function __eval_exprs(__parsed_exprs)
     (fd, __msg) = __parsed_exprs
-    html = ""
-    status = "200 OK"
     f = nothing
+    match_route = false
     for i = __handlers
         m = match(i[1], __msg.path)
         if m != nothing && m.match == __msg.path            
-            f = get_func()
-            if __msg.method == "GET"
+            match_route = true
+            f = get_func(__msg)
+            if __msg.method == "GET" && i[2].get != nothing
                 i[2].get(f)
-            else __msg.method == "POST"
+            elseif __msg.method == "POST" && i[2].post != nothing
                 i[2].post(f)
+            else
+                f.senderror(405)
             end
             break
         end
     end
-    html = f.data["html"]
+    
+    if match_route
+        html = f.data["html"]
+        status = f.data["status"]
+    else
+        status = __htmlfunc_senderror(404)
+        html = status
+    end
     global __io, __connectfd
-    write(__io, "HTTP/1.1 $status\n")
+    write(__io, "$DEFAULT_PROTOCOL $status\n")
     write(__io, "Server: Microsoft-IIS/5.0\n")
-    write(__io, strcat("Content-Length: $(length(html))\n"))
+    write(__io, "Content-Length: $(length(html))\n")
     write(__io, "Content-Type: text/html\n\n")
     write(__io, "$html\n")
     flush(__io)
@@ -119,8 +154,10 @@ end
 
 type Func
     data::HashTable
+    header::__Header
     write::Function
     senderror::Function
+    get_argument::Function
 end
 
 type Handler
@@ -147,29 +184,47 @@ function __htmlfunc_senderror(code)
         502 => "Bad Gateway",
         504 => "Gateway Timeout"
     }
-    status = "$code $(lib[code])"
+    "$code $(lib[code])"
 end
 
-function get_func()
-    data = HashTable()
-    data["html"] = ""
+function get_func(header)
+    data = {"html" => "", "status" => "200 OK"}
     func_base = Func(
-        data,
+        data,header,
         function (str)
-            func_base.data["html"] = __htmlfunc_write(func_base.data["html"], str)
+            func_base.data["html"] = strcat(func_base.data["html"], ASCIIString(str.data))
         end,
         function (code)
-            status = __htmlfunc_senderror(code)
-            func_base.data["html"] = status
+            func_base.data["status"] = __htmlfunc_senderror(code)
+            func_base.data["html"] = func_base.data["status"]
         end,
+        function (field, default)
+            println(func_base.header)
+            if has(func_base.header.data, "args") && has(func_base.header.data["args"], field)
+                return func_base.header.data["args"][field]
+            end
+            default
+        end
     )
 end
 
+
+
+__ports = nothing
+__sockfd = nothing
 __connectfd = nothing
 __io = nothing
 __eval_channel = RemoteRef()
 function loop()
-    global __connectfd, __io
+    global __connectfd, __io, __port, __sockfd
+    __ports = [int16(4444)]
+    __sockfd = ccall(:open_any_tcp_port, Int32, (Ptr{Int16},), __ports)
+    if __sockfd == -1
+        # couldn't open the socket
+        println("could not open server socket on port 4444.")
+        exit()
+    end
+    println(__ports)
     __connectfd = ccall(:accept, Int32, (Int32, Ptr{Void}, Ptr{Void}), __sockfd, C_NULL, C_NULL)
     __io = fdio(__connectfd, true)
     add_fd_handler(__connectfd, __socket_callback)    
