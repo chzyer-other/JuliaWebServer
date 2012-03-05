@@ -24,8 +24,8 @@ All the page must use UTF-8 encoding.
 - **send status:** you can send the http status code like "404", "200" etc.
 - **get argument:** get the POST argument and auto use URLDecode,support Chinese
 - **set/get cookie** now support.
+- **template** support template(extend, for, if).
 
 ## TODO
 
 - **support asynchronous**
-- **support template**
