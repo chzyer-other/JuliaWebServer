@@ -36,14 +36,14 @@ All the page must use UTF-8 encoding.
 2. `sudo nano default` (you can choose other file)
 
 server {
-
-        listen 80;
-        server_name julia;
-        index index.html index.htm;
-        location / {
-                proxy_pass http://127.0.0.1:4444;
-                proxy_set_header Host $host;
-       }
-
+    listen 80;
+    server_name julia;
+    index index.html index.htm;
+    location / {
+        proxy_pass http://127.0.0.1:4444;
+        proxy_set_header Host $host;
+ 	}
 }
+
+end
 
