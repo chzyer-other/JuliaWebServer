@@ -36,6 +36,7 @@ All the page must use UTF-8 encoding.
 2. `sudo nano default` (you can choose other file)
 
 	server {
+	
 	    listen 80;
 	    server_name julia;
 	    index index.html index.htm;
