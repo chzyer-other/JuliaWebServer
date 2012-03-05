@@ -16,3 +16,4 @@ All the page must use UTF-8 encoding.
 
 - **support cookie**
 - **support asynchronous**
+- **support template**
