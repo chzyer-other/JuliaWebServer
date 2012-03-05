@@ -33,12 +33,20 @@ All the page must use UTF-8 encoding.
 ## Bind NginX
 
 server {
+
         listen 80;
+
         server_name julia;
+
         index index.html index.htm;
+
         location / {
+
                 proxy_pass http://127.0.0.1:4444;
+
                 proxy_set_header Host $host;
+
        }
+       
 }
 
