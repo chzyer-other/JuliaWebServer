@@ -32,6 +32,9 @@ All the page must use UTF-8 encoding.
 
 ## Bind NginX
 
+`cd /etc/nginx/sites-available/`
+`sudo nano default` (you can choose other file)
+
 server {
         listen 80;
         server_name julia;
