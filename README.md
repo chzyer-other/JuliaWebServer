@@ -17,3 +17,14 @@ All the page must use UTF-8 encoding.
 - **support cookie**
 - **support asynchronous**
 - **support template**
+
+## Example
+
+see the sub directory "example" .
+
+1. open the file `julia_webserver_base.j`
+2. change LIB_PATH point to the juliawebserver framework path, like `/home/cheney/juliawebserver`
+3. `cd example`
+4. `julia main.j`
+5. wait for a moment and it will display the port , default 4444
+6. now you can browse `http://localhost:4444`
