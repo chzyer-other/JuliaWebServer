@@ -12,7 +12,8 @@ type Func
     senderror::Function
     get_argument::Function
     set_cookie::Function
-    get_cookie::Function    
+    get_cookie::Function
+    render::Function
 end
 
 type Handler

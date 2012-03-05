@@ -1,0 +1,21 @@
+{% extend base %}
+{% block title %}thisisnewtitle{% end %}
+
+{% block body %}
+	{% for i=1:10 %}
+	<a href="javascript:;">{{ i }}</a>
+	{% end %}
+thisisbody
+	{% if 1==2 %}
+		1 = 2
+	{% elseif 2==2 %}
+		{% if 1==1 %}
+			哈拉拉	
+		{% else %}
+		也是
+		{% end %}
+	{% else %}
+		1 != 2<br>
+		salflkjsadlfkjasdf
+	{% end %}
+{% end %}

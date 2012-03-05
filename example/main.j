@@ -7,6 +7,7 @@ mainHandler = Handler(
 		f.write(f.get_cookie("user", nothing))
 		f.write(f.get_cookie("_xsrf", nothing))
 		f.write("欢迎通过get方式访问main")
+		f.render("index")
 	end
 	, 
 	function (f)

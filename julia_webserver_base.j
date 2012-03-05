@@ -4,14 +4,15 @@ const DEFAULT_METHOD = "GET"
 const DEFAULT_PATH = "/"
 const LIB_PATH = "/home/cheney/juliawebserver/"
 const LIB_FILE_PREFIX = strcat(LIB_PATH, "julia_webserver_")
+const DEBUG = true
 
-function load(mods)
+function loads(mods::Array{ASCIIString})
     for mod = mods
         load(strcat(LIB_FILE_PREFIX, mod, ".j"))
     end
 end
 
-load(["func_string", "type", "func_iostream"])
+loads(["string", "type", "iostream", "template"])
 load("./ui/webserver/message_types.h")
 
 
@@ -73,7 +74,13 @@ function get_func(header)
                 return func_base.header.data["Cookie"][field]
             end
             default
-        end
+        end,
+
+        #render
+        function (filename)
+            content = render_string(filename)
+            func_base.write(content)
+        end,
     )
 end
 
@@ -132,7 +139,7 @@ function loop()
     end
     println(__ports)    
     __connect()
-    add_fd_handler(__connectfd, __socket_callback)    
+    add_fd_handler(__connectfd, __socket_callback)
     while true
         __eval_exprs(take(__eval_channel))
     end
