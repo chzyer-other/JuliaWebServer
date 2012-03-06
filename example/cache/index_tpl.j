@@ -3,6 +3,7 @@ function html()
 extend = "base"
 title = """thisisnewtitle"""
 body = """
+<a href=\"javascript\"><img src=\"http://img2.douban.com/pics/fw2douban_s.png\" alt=\"推荐到豆瓣\" /></a>
 	"""
 for i=1:10
 body = strcat(body, """
@@ -31,5 +32,8 @@ body = strcat(body, """
 		salflkjsadlfkjasdf
 	""")
 end
+body = strcat(body, """
+	<img src=\"http://img2.douban.com/pics/fw2douban_s.png\" alt=\"推荐到豆瓣\" />
+""")
 	{"extend"=>extend,"title"=>title,"body"=>body,}
 end

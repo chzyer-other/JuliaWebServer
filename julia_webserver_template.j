@@ -14,9 +14,7 @@ function render_string(filename, data)
     content
 end
 
-function addslashes(str)
-    replace(str, "\"", "\\\"")
-end
+addslashes(str) = replace(str, "\"", "\\\"")
 
 function replace_match(body, match_data::RegexMatch, replacement)
     prefix = body[1: match_data.offset - 1]
@@ -64,6 +62,7 @@ function create_extend_template(match_extend, content)
     current_index = 1
     last_block_start = -1
     last_nest_start = -1
+    last_end_start = -1
     current_block = ""
     return_field = []
     level = 0
@@ -95,10 +94,17 @@ function create_extend_template(match_extend, content)
         level = get_level(method, level)
         if level == -1 && method == "end"
             level = 0
+            if last_end_start > 0
+                tmp_content = addslashes(content[last_end_start: current_index - 2])
+                write_data = strcat(write_data, "$current_block = strcat($current_block, ", quot,  tmp_content, quot, ")\n")
+                last_end_start = -1
+            end
             continue
+        elseif method == "end"
+            last_end_start = current_index + length(match_command.match) - 1
         end
 
-        if method == "block"            
+        if method == "block"       
             current_block = match_command.captures[2]
             return_field = append(return_field, [current_block])
         end
@@ -114,7 +120,7 @@ end
 
 function make_nest_string(content, current_block, start, index)
     quot = "\"\"\""
-    tmp_content = replace(content[start: index - 2], "\"", "\\\"")
+    tmp_content = addslashes(content[start: index - 2])
     m = match(r"{{ (\w+) }}", tmp_content)
     if m != nothing
         tmp_content = strcat(tmp_content[1:m.offset-1], "\$(", m.captures[1], ")", tmp_content[m.offset + length(m.match):])
