@@ -6,7 +6,7 @@ body = """
 	"""
 for i=1:10
 body = strcat(body, """
-	<a href=\"javascript:;\">$(i)</a>
+	<a href=\"javascript:;\">$(i)d</a>
 	""")
 end
 if 1==2

@@ -76,7 +76,7 @@ function create_extend_template(match_extend, content)
         method = match_command.captures[1]
 
         if last_block_start > 0
-            write_data = strcat(write_data, content[last_block_start: current_index - 2], quot, "\n")
+            write_data = strcat(write_data, addslashes(content[last_block_start: current_index - 2]), quot, "\n")
             last_block_start = -1
         end
 
