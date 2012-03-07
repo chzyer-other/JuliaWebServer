@@ -16,7 +16,7 @@ function __write_back(html, status, cookie)
     write(__io, "$DEFAULT_PROTOCOL $status\n")
     write(__io, "Server: Microsoft-IIS/5.0\n")
     write(__io, "Content-Length: $(length(html))\n")
-    if length(cookie) > 0
+    if cookie != nothing && length(cookie) > 0
         for i = cookie
             write(__io, "Set-Cookie: $i\n")
         end

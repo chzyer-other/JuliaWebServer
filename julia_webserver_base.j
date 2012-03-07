@@ -111,15 +111,18 @@ function __eval_exprs(__parsed_exprs)
             break
         end
     end
-    
-    if match_route
+
+    if f != nothing && match_route
         html = f.data["html"]
         status = f.data["status"]
+        cookie = f.data["cookie"]
     else
         status = __htmlfunc_senderror(404)
         html = status
+        cookie = nothing
     end
-    __write_back(html, status, f.data["cookie"])
+
+    __write_back(html, status, cookie)
     __connect()
 end
 

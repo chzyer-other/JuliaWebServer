@@ -6,15 +6,22 @@ function render_string(filename, data)
     end
 
     html = get_data(filename)
-    if typeof(html) == HashTable{ASCIIString,Any}
-        content = render_string(html["extend"], html)
-    else
+
+    if typeof(html) == typeof(has)
         content = html(data)
+    else
+        content = render_string(html["extend"], html)
     end
     content
 end
 
-addslashes(str) = replace(str, "\"", "\\\"")
+function addslashes(str)
+    s = replace(str, "\"", "\\\"")
+    s = replace(s, "\$", "\\\$")
+    s = replace(s, "\\n", "\\\\n")
+    s = replace(s, "\r", "\\\r")
+    s
+end
 
 function replace_match(body, match_data::RegexMatch, replacement)
     prefix = body[1: match_data.offset - 1]
@@ -39,7 +46,7 @@ function create_base_template(content)
     current_index = 1
     block_data = HashTable()
     while true
-        match_block = match(r"{% block ([^\s]+) %}([^{]+){% end %}", content, current_index)
+        match_block = match(r"{% block ([^\s]+) %}([^{]*){% end %}", content, current_index)
         if match_block == nothing
             break
         end
@@ -47,10 +54,10 @@ function create_base_template(content)
         key, value = match_block.captures
         block_data[key] = value
         content = replace_match(content, match_block, "\$($key)")
-        content = replace_match(content, r"{{ ([^\s]+) }}", "\$(\$1)")
+        content = replace_match(content, r"{{\s(.+?)\s}}", "\$(\$1)")
     end
     for i = block_data
-        data = strcat(quot, addslashes(i[2]), quot)
+        data = strcat(quot, i[2], quot)
         write_data = strcat(write_data, i[1], " = has(data, \"$(i[1])\") ? data[\"$(i[1])\"] : ", data, "\n")
     end
     strcat(write_data, quot, content, quot, "\n")
@@ -75,7 +82,7 @@ function create_extend_template(match_extend, content)
         method = match_command.captures[1]
 
         if last_block_start > 0
-            write_data = strcat(write_data, addslashes(content[last_block_start: current_index - 2]), quot, "\n")
+            write_data = strcat(write_data, content[last_block_start: current_index - 2], quot, "\n")
             last_block_start = -1
         end
 
@@ -91,14 +98,15 @@ function create_extend_template(match_extend, content)
             last_block_start = current_index + length(match_command.match) - 1
         end
 
+        if last_end_start > 0
+            tmp_content = content[last_end_start: current_index - 2]
+            write_data = strcat(write_data, "$current_block = strcat($current_block, ", quot,  tmp_content, quot, ")\n")
+            last_end_start = -1
+        end
+
         level = get_level(method, level)
         if level == -1 && method == "end"
-            level = 0
-            if last_end_start > 0
-                tmp_content = addslashes(content[last_end_start: current_index - 2])
-                write_data = strcat(write_data, "$current_block = strcat($current_block, ", quot,  tmp_content, quot, ")\n")
-                last_end_start = -1
-            end
+            level = 0            
             continue
         elseif method == "end"
             last_end_start = current_index + length(match_command.match) - 1
@@ -120,8 +128,8 @@ end
 
 function make_nest_string(content, current_block, start, index)
     quot = "\"\"\""
-    tmp_content = addslashes(content[start: index - 2])
-    m = match(r"{{ (\w+) }}", tmp_content)
+    tmp_content = content[start: index - 2]
+    m = match(r"{{\s(.+?)\s}}", tmp_content)
     if m != nothing
         tmp_content = strcat(tmp_content[1:m.offset-1], "\$(", m.captures[1], ")", tmp_content[m.offset + length(m.match):])
     end
@@ -158,7 +166,7 @@ end
 function update_lib(filename)
     quot = "\"\"\""
     stream = open(strcat("./tpl/", filename, ".html"))
-    content = readall(stream)
+    content = addslashes(readall(stream))
     write_data = ""
     match_extend = match(r"{% extend ([^\s]+) %}", content)
     write_data = strcat(write_data, "is_extend = ", match_extend == nothing ? "false" : "true", "\n")
@@ -170,6 +178,7 @@ function update_lib(filename)
     end
     write_data = strcat(write_data, "end")    
     write_data = UTF8String(write_data.data)
+    filename = replace(filename, "/", "_")
     stream = open(strcat("./cache/", filename, "_tpl.j"), "w")
     write(stream, write_data)
     flush(stream)
@@ -191,6 +200,7 @@ end
 
 function get_data(filename)
     begin
+        filename = replace(filename, "/", "_")
         load(strcat("./cache/", filename, "_tpl.j"))
         if is_extend
             return html()

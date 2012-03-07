@@ -1,11 +1,20 @@
-<html>
+<!DOCTYPE HTML>
+<html lang=zh-CN>
 <head>
-	<title>{% block title %}你好, 这里是base的标题{% end %}</title>
+	<meta charset="utf-8">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<link href="/css/base.css" media="screen, projection" rel="stylesheet" type="text/css" />
+	<title>{% block title %}hello world{% end %}</title>	
+	<script src="/js/jquery.min.js"></script>
 </head>
 <body>
-	{% block body %}
-	{% end %}
-	
-	{{ time() }}
+	<div id="topbar">Welcome to JuliaWebServer</div>
+	<div id="header"><a href="/">JuliaWebServer</a></div>
+	<div id="bar"><a href="/">index</a> &rsaquo;  {% block bar %}{% end %}</div>
+	<div id="body">{% block body %}asdf{% end %}</div>
+	<div id="footbar">Here is the footer</div>
+	<script>
+	{% block js %}{% end %}
+	</script>
 </body>
 </html>

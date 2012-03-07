@@ -3,10 +3,6 @@ load("sub.j")
 
 mainHandler = Handler(
 	function (f)
-		
-		f.write(f.get_cookie("user", nothing))
-		f.write(f.get_cookie("_xsrf", nothing))
-		f.write("欢迎通过get方式访问main")
 		f.render("index")
 	end
 	, 
@@ -17,10 +13,17 @@ mainHandler = Handler(
 	end
 )
 
+SourceLoopHandler = Handler(
+	function (f)
+		f.render("source/loop")
+	end,
+	nothing
+)
 
 __handlers = [
     (r"/", mainHandler),
-    (r"/[^/]+", subHandler)
+    (r"/source/loop", SourceLoopHandler),
+    (r"/[^/]+", subHandler),
 ]
 _setting = {
 	debug = true

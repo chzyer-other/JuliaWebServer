@@ -1,24 +1,7 @@
 {% extend base %}
-{% block title %}thisisnewtitle{% end %}
+{% block title %}welcome to julia webserver{% end %}
 
 {% block body %}
-<a href="javascript"><img src="http://img2.douban.com/pics/fw2douban_s.png" alt="推荐到豆瓣" /></a>
-	{% for i=1:10 %}
-	<a href="javascript:;">{{ i }}d</a>
-	{% end %}
-thisisbody
-	{% if 1==2 %}
-		1 = 2
-	{% elseif 2==2 %}
-		{% if 1==1 %}
-			哈拉拉	
-		{% else %}
-		也是
-		{% end %}
-	{% else %}
-		1 != 2<br>
-		salflkjsadlfkjasdf
-	{% end %}
-	<img src="http://img2.douban.com/pics/fw2douban_s.png" alt="推荐到豆瓣" />
+<div>This example will show you how to use template:</div>
+<li><a href="/source/loop">loop</a></li>
 {% end %}
-

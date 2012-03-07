@@ -1,0 +1,52 @@
+html{font-size:14px;background:#ccc;}
+body{
+	width:900px;
+	background: #999;
+	margin: 0 auto;
+	font-family:"Microsoft Yahei";
+}
+a{
+	text-decoration:none;
+}
+li {list-style:none;}
+body > #topbar{
+	background:#555;
+	padding:2px;
+	color:#fff;
+	padding-left:5px;
+}
+body > #footbar{
+	background:#888;
+	text-align:right;
+	padding:2px;
+	color:#000;
+	padding-right:5px;
+}
+body > #header{
+	font-size:32px;
+	background: #aaa;
+	padding:20px;
+}
+body > #header a{
+	color:#88c701;
+}
+body > #body{
+	padding-left:5px;
+	padding-right:5px;
+}
+
+body > #body div.code,div.viewcode{
+	border:1px dashed #555;
+	padding:5px;
+	margin:10px;
+	background:#ddd;
+}
+
+body > #bar {
+	background:#444;
+	padding-left:10px;
+	color:#999;
+}
+body > #bar a{
+	color:#aaa;
+}
