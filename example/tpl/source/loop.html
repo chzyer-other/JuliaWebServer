@@ -5,9 +5,9 @@
 <h2>loop</h2>
 <h3>loop source:</h3>
 <code>
-{\% for i=1:10 %}
-<li><a href="javascript:;">item{\{ i }}</a></li>
-{\% end %}
+{&#37; for i=1:10 %}
+<li><a href="javascript:;">item{{ i }}</a></li>
+{&#37; end %}
 </code>
 <h3>real source:</h3>
 <code>
@@ -17,8 +17,8 @@
 </code>
 <h3>html view:</h3>
 <div class="viewcode">
-	{% for ii=1:10 %}
-	<li><a href="javascript:;">item{{ ii+11 }}</a></li>
+	{% for i=1:10 %}
+	<li><a href="javascript:;">item{{ i }}</a></li>
 	{% end %}
 </div>
 {% end %}
@@ -27,6 +27,7 @@
 function replace(str, reg, news){
 	return str.replace(new RegExp(reg, "gm"), news)
 }
+
 $("code").each(function(){
 	html = $(this).html();
 	new_html = html;
@@ -36,7 +37,8 @@ $("code").each(function(){
 		new_html = new_html.substring(1)
 	}
 	new_html = replace(new_html, "\n", "<br>")
-	$(this).html(new_html).wrap("<div class='code'></div>")
+	$(this).html('').html(new_html).wrap("<div class='code'></div>")
 
 })
+
 {% end %}

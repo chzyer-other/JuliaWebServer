@@ -140,7 +140,7 @@ function loop()
         println("could not open server socket on port 4444.")
         exit()
     end
-    println(__ports)    
+    println(__ports)
     __connect()
     add_fd_handler(__connectfd, __socket_callback)
     while true

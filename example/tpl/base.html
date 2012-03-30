@@ -7,12 +7,29 @@
 	<title>{% block title %}hello world{% end %}</title>	
 	<script src="/js/jquery.min.js"></script>
 </head>
+
 <body>
-	<div id="topbar">Welcome to JuliaWebServer</div>
-	<div id="header"><a href="/">JuliaWebServer</a></div>
-	<div id="bar"><a href="/">index</a> &rsaquo;  {% block bar %}{% end %}</div>
+	<div id="topbar">
+		<div class="container">
+			<span style="float:left"><a href="/">JuliaWebServer</a></span>
+
+			<div class="banner">
+				<li>Index</li>
+			</div>
+			<div style="clear:both"></div>
+		</div>
+		
+	</div>
+	
 	<div id="body">{% block body %}asdf{% end %}</div>
-	<div id="footbar">Here is the footer</div>
+
+	<div id="footbar">
+		<div class="container">
+			<span style="float:right">Powered By Chzyer</span>
+		Here is the footer
+		</div>
+	</div>
+
 	<script>
 	{% block js %}{% end %}
 	</script>

@@ -47,6 +47,7 @@ function __read_header()
     __protocol = DEFAULT_PROTOCOL
     __data = HashTable()
     post_read_more_line = false
+
     while true
         line = __readline()
         if length(line) <= 1

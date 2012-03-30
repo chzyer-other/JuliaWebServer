@@ -1,51 +1,74 @@
-html{font-size:14px;background:#ccc;}
+html{font-size:14px;background: url("/img/bg.gif");}
 body{
-	width:900px;
-	background: #999;
-	margin: 0 auto;
-	font-family:"Microsoft Yahei";
+	margin:0;
+	font-family:"courier";
 }
 a{
 	text-decoration:none;
+	color:#5488de;
+}
+a:hover{
+	text-decoration:underline;
+	color: #1e347b;
 }
 li {list-style:none;}
-body > #topbar{
-	background:#555;
-	padding:2px;
+#topbar a{
 	color:#fff;
-	padding-left:5px;
 }
+#topbar{
+	position: absolute;
+	width:100%;
+	background:#555;
+	color:#fff;
+	left:0px;
+}
+#topbar .container{
+	padding:10px;
+}
+
+#topbar .banner {
+	float: left;
+	margin-left:20px;
+}
+
 body > #footbar{
-	background:#888;
-	text-align:right;
-	padding:2px;
+	position: absolute;
+	left:0;
+	width:100%;
+	border-top:1px solid #bbb;
+	background:#fff;
 	color:#000;
-	padding-right:5px;
 }
+
+body > #footbar > .container{
+	padding:10px;
+}
+
 body > #header{
 	font-size:32px;
 	background: #aaa;
 	padding:20px;
+	padding-top: 40px;
 }
 body > #header a{
 	color:#88c701;
 }
 body > #body{
-	padding-left:5px;
-	padding-right:5px;
+	padding:10px;
+	padding-top:50px;
 }
 
 body > #body div.code,div.viewcode{
-	border:1px dashed #555;
+	border:1px solid #e1e1e8;
 	padding:5px;
 	margin:10px;
-	background:#ddd;
+	background:#f7f7f9;
 }
 
 body > #bar {
 	background:#444;
 	padding-left:10px;
-	color:#999;
+	color:#ddd;
 }
 body > #bar a{
 	color:#aaa;

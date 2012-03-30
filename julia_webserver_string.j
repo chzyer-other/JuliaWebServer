@@ -1,6 +1,9 @@
 function +(str1::ASCIIString, str2::ASCIIString)
     strcat(str1, str2)
 end
+function replace(s::ASCIIString, ss::Char, sss::ASCIIString)
+    replace(s, Regex(UTF8String([uint8(ss)])), sss)
+end
 
 function URLDecode(str)
     str = replace(str, "+", "%20")

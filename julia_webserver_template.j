@@ -16,10 +16,14 @@ function render_string(filename, data)
 end
 
 function addslashes(str)
-    s = replace(str, "\"", "\\\"")
-    s = replace(s, "\$", "\\\$")
+    s = str
+    #s = replace(str, r"\\", "\\\\")
+    s = replace(s, "\"", "\\\"")
+    s = replace(s, r"\$", "\\\$")
+
+    #for javascript
     s = replace(s, "\\n", "\\\\n")
-    s = replace(s, "\r", "\\\r")
+    s = replace(s, "\\r", "\\\\r")
     s
 end
 
