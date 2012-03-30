@@ -1,8 +1,8 @@
 function +(str1::ASCIIString, str2::ASCIIString)
     strcat(str1, str2)
 end
-function replace(s::ASCIIString, ss::Char, sss::ASCIIString)
-    replace(s, Regex(UTF8String([uint8(ss)])), sss)
+function replace(str::ASCIIString, ch::Char, replacement::ASCIIString)
+    replace(str, Regex(UTF8String([uint8(ch)])), replacement)
 end
 
 function URLDecode(str)
